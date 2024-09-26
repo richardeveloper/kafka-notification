@@ -13,7 +13,8 @@ import javax.swing.ImageIcon;
 public class FileUtils {
 
   private static final String HTML_PATH = "src/main/resources/files/notification.html";
-  private static final String ICON_PATH = "src/main/resources/files/notification.png";
+  private static final String NOTIFICATION_ICON_PATH = "src/main/resources/files/notification.png";
+  private static final String REPORT_ICON_PATH = "src/main/resources/files/report.png";
 
   private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss.SSS");
 
@@ -38,8 +39,12 @@ public class FileUtils {
     }
   }
 
-  public static ImageIcon getIcon() {
-    return new ImageIcon(ICON_PATH);
+  public static ImageIcon getNotificationIcon() {
+    return new ImageIcon(NOTIFICATION_ICON_PATH);
+  }
+
+  public static ImageIcon getReportIcon() {
+    return new ImageIcon(REPORT_ICON_PATH);
   }
 
 }

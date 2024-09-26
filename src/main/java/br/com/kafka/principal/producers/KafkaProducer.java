@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class KafkaProducer {
 
-  private static final int BATCH_SIZE = 3;
+  private static final int BATCH_SIZE = 5;
 
   private static final String SINGLE_TOPIC = "single-notification";
   private static final String BATCH_TOPIC = "batch-notification";
@@ -64,7 +64,6 @@ public class KafkaProducer {
         case MID:
         case HIGH:
           kafkaTemplate.send(SINGLE_TOPIC, notification.getCode(), json);
-
           KafkaProducer.log.info("Notificação {} agendada com sucesso.", notification.getCode());
           break;
       }

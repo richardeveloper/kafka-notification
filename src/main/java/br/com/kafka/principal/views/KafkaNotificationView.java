@@ -1,10 +1,14 @@
 package br.com.kafka.principal.views;
 
+import br.com.kafka.principal.entities.LogNotificationEntity;
 import br.com.kafka.principal.enums.PriorityEnum;
 import br.com.kafka.principal.models.Notification;
 import br.com.kafka.principal.producers.KafkaProducer;
+import br.com.kafka.principal.repositories.LogNotificationRepository;
 import br.com.kafka.principal.utils.FileUtils;
 
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -19,8 +23,13 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -29,9 +38,9 @@ import javax.swing.text.PlainDocument;
 
 import lombok.Getter;
 
-@Getter
 public class KafkaNotificationView {
 
+  @Getter
   private JPanel mainPanel;
 
   private JLabel title;
@@ -46,25 +55,31 @@ public class KafkaNotificationView {
   private JPanel contentTextPanel;
   private JTextField contentTextField;
 
-  private JButton sendButton;
   private JPanel buttonPanel;
+  private JButton sendButton;
+  private JButton logButton;
+  private JButton closeButton;
 
   private JDialog dialog;
 
   private final KafkaProducer kafkaProducer;
+  private final LogNotificationRepository repository;
 
-  public KafkaNotificationView(JFrame frame, KafkaProducer kafkaProducer) {
+  public KafkaNotificationView(JFrame frame, KafkaProducer kafkaProducer, LogNotificationRepository repository) {
     this.kafkaProducer = kafkaProducer;
+    this.repository = repository;
 
     setUpTextField();
 
-    sendButton(frame);
-    activityReminderRadioButton();
-    scheduleChangeRadioButton();
-    importantEventsRadioButton();
+    actionSendButton(frame);
+    actionLogButton(frame);
+    actionActivityReminderRadioButton();
+    actionScheduleChangeRadioButton();
+    actionImportantEventsRadioButton();
+    actionCloseButton(frame);
   }
 
-  public void sendButton(JFrame frame) {
+  public void actionSendButton(JFrame frame) {
     this.sendButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -98,7 +113,72 @@ public class KafkaNotificationView {
     });
   }
 
-  public void activityReminderRadioButton() {
+  public void actionLogButton(JFrame frame) {
+    this.logButton.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        List<LogNotificationEntity> logs = repository.findAll();
+
+        if (logs.isEmpty()) {
+          JOptionPane.showMessageDialog(
+            frame,
+            "No momento não existem registros de logs.",
+            "AVISO",
+            JOptionPane.WARNING_MESSAGE
+          );
+          return;
+        }
+
+        String[] columns = { "#", "Data de Agendamento", "Código da Notificação", "Código do Lote", "Data de Envio", "Notificação"};
+
+        Object[][] rows = new Object[logs.size()][columns.length];
+
+        for (int i = 0; i < logs.size(); i++) {
+          rows[i][0] = (i + 1);
+          rows[i][1] = logs.get(i).getScheduleDate();
+          rows[i][2] = logs.get(i).getNotificationCode();
+          rows[i][3] = logs.get(i).getBatchCode() != null ? logs.get(i).getBatchCode() : "-";
+          rows[i][4] = logs.get(i).getSendDate();
+          rows[i][5] = logs.get(i).getNotification();
+        }
+
+        DefaultTableModel tableModel = new DefaultTableModel(rows, columns);
+
+        JTable table = new JTable(tableModel);
+        table.setRowHeight(25);
+        table.getTableHeader().setFont(new Font("JetBrains Mono", Font.PLAIN,  14));
+
+        table.getColumnModel().getColumn(0).setPreferredWidth(60);
+        table.getColumnModel().getColumn(1).setPreferredWidth(210);
+        table.getColumnModel().getColumn(2).setPreferredWidth(160);
+        table.getColumnModel().getColumn(3).setPreferredWidth(160);
+        table.getColumnModel().getColumn(4).setPreferredWidth(210);
+        table.getColumnModel().getColumn(5).setPreferredWidth(1500);
+
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        for (int i = 0; i < columns.length; i++) {
+          table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
+
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setPreferredSize(new Dimension(1000, 500));
+        scrollPane.setEnabled(false);
+
+        JOptionPane.showMessageDialog(
+          frame,
+          scrollPane,
+          "RELATÓRIO",
+          JOptionPane.INFORMATION_MESSAGE,
+          FileUtils.getReportIcon()
+        );
+      }
+    });
+  }
+
+  public void actionActivityReminderRadioButton() {
     this.activityReminderRadioButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -110,7 +190,7 @@ public class KafkaNotificationView {
     });
   }
 
-  public void scheduleChangeRadioButton() {
+  public void actionScheduleChangeRadioButton() {
     this.scheduleChangeRadioButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -122,7 +202,7 @@ public class KafkaNotificationView {
     });
   }
 
-  public void importantEventsRadioButton() {
+  public void actionImportantEventsRadioButton() {
     this.importantEventsRadioButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -130,6 +210,15 @@ public class KafkaNotificationView {
         disableAllButtons();
         importantEventsRadioButton.setSelected(true);
         contentTextField.setText("Dia 12/12/2024 acontece a XXV conferência de apresentação das atualizações e novidades do Java Swing.");
+      }
+    });
+  }
+
+  public void actionCloseButton(JFrame frame) {
+    this.closeButton.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        frame.dispose();
       }
     });
   }
@@ -144,7 +233,7 @@ public class KafkaNotificationView {
       tabbedPane,
       notifications.size() > 1 ? "NOTIFICAÇÕES ENVIADAS": "NOTIFICAÇÃO ENVIADA",
       JOptionPane.INFORMATION_MESSAGE,
-      FileUtils.getIcon()
+      FileUtils.getNotificationIcon()
     );
   }
 
