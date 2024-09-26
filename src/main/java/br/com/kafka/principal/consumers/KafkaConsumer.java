@@ -1,8 +1,10 @@
 package br.com.kafka.principal.consumers;
 
 import br.com.kafka.principal.KafkaNotificationApplication;
+import br.com.kafka.principal.entities.LogNotificationEntity;
 import br.com.kafka.principal.models.Notification;
 
+import br.com.kafka.principal.repositories.LogNotificationRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
@@ -22,21 +24,32 @@ import org.springframework.stereotype.Service;
 public class KafkaConsumer {
 
   private static final String SINGLE_TOPIC = "single-notification";
+  private static final String SINGLE_GROUP = "single-group";
+
   private static final String BATCH_TOPIC = "batch-notification";
+  private static final String BATCH_GROUP = "batch-group";
 
   private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss.SSS");
 
   @Autowired
   private ObjectMapper objectMapper;
 
-  @KafkaListener(topics = SINGLE_TOPIC, groupId = "single-group")
+  @Autowired
+  private LogNotificationRepository logNotificationRepository;
+
+  @KafkaListener(topics = SINGLE_TOPIC, groupId = SINGLE_GROUP)
   public void receiveMessage(String message) {
     try {
       Notification notification = objectMapper.readValue(message, Notification.class);
-
       notification.setSendDate(LocalDateTime.now());
-      log.info("Notificação recebida com sucesso.");
-      logNotification(notification);
+
+      LogNotificationEntity log = logNotificationRepository.findByNotificationCode(notification.getCode());
+      log.setSendDate(notification.getSendDate());
+
+      KafkaConsumer.log.info("Notificação recebida com sucesso.");
+      logInfoNotification(notification);
+
+      logNotificationRepository.save(log);
 
       KafkaNotificationApplication.showResult(List.of(notification));
     }
@@ -45,7 +58,7 @@ public class KafkaConsumer {
     }
   }
 
-  @KafkaListener(topics = BATCH_TOPIC, groupId = "batch-group", containerFactory = "batchKafkaListenerContainerFactory")
+  @KafkaListener(topics = BATCH_TOPIC, groupId = BATCH_GROUP, containerFactory = "batchKafkaListenerContainerFactory")
   public void receiveMessages(List<String> messages) {
     log.info("Lote de notificações recebido com sucesso. Tamamho: {}", messages.size());
 
@@ -54,11 +67,16 @@ public class KafkaConsumer {
 
       for (String message : messages) {
         Notification notification = objectMapper.readValue(message, Notification.class);
-
         notification.setSendDate(LocalDateTime.now());
-        logNotification(notification);
+
+        LogNotificationEntity log = logNotificationRepository.findByNotificationCode(notification.getCode());
+        log.setSendDate(notification.getSendDate());
+
+        logInfoNotification(notification);
 
         notifications.add(notification);
+
+        logNotificationRepository.save(log);
       }
 
       KafkaNotificationApplication.showResult(notifications);
@@ -68,7 +86,7 @@ public class KafkaConsumer {
     }
   }
 
-  private static void logNotification(Notification notification) {
+  private static void logInfoNotification(Notification notification) {
     log.info("==============================================================================================================");
     log.info("DETALHES DA NOTIFICAÇÃO");
     log.info("==============================================================================================================");

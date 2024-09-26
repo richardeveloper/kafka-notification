@@ -4,11 +4,13 @@ import br.com.kafka.principal.enums.PriorityEnum;
 import br.com.kafka.principal.models.Notification;
 import br.com.kafka.principal.producers.KafkaProducer;
 import br.com.kafka.principal.utils.FileUtils;
-import java.awt.Insets;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import java.util.List;
 import java.util.UUID;
+
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
@@ -24,6 +26,7 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.PlainDocument;
+
 import lombok.Getter;
 
 @Getter
@@ -99,7 +102,7 @@ public class KafkaNotificationView {
     this.activityReminderRadioButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        contentTextField.setDocument(new PlainDocument());
+        clearTextField();
         disableAllButtons();
         activityReminderRadioButton.setSelected(true);
         contentTextField.setText("Atenção, a data limite para entrega da atividade é dia 04/09/2024.");
@@ -111,7 +114,7 @@ public class KafkaNotificationView {
     this.scheduleChangeRadioButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        contentTextField.setDocument(new PlainDocument());
+        clearTextField();
         disableAllButtons();
         scheduleChangeRadioButton.setSelected(true);
         contentTextField.setText("Em virtude do feriado nacional do dia da Consciência Negra, não haverá aula no dia 20/11/2024.");
@@ -123,7 +126,7 @@ public class KafkaNotificationView {
     this.importantEventsRadioButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        contentTextField.setDocument(new PlainDocument());
+        clearTextField();
         disableAllButtons();
         importantEventsRadioButton.setSelected(true);
         contentTextField.setText("Dia 12/12/2024 acontece a XXV conferência de apresentação das atualizações e novidades do Java Swing.");
@@ -164,16 +167,10 @@ public class KafkaNotificationView {
     return tabbedPane;
   }
 
-  private boolean isInvalidButtons() {
-    return !activityReminderRadioButton.isSelected()
-      && !scheduleChangeRadioButton.isSelected()
-      && !importantEventsRadioButton.isSelected();
-  }
-
   private Notification createNotification() {
     String code = UUID.randomUUID().toString()
       .replace("-", "")
-      .substring(0, 10);
+      .substring(0, 16);
 
     String message = contentTextField.getText();
 
@@ -196,10 +193,20 @@ public class KafkaNotificationView {
     return new Notification(code, message, priority, event);
   }
 
+  private boolean isInvalidButtons() {
+    return !activityReminderRadioButton.isSelected()
+      && !scheduleChangeRadioButton.isSelected()
+      && !importantEventsRadioButton.isSelected();
+  }
+
   private void disableAllButtons() {
     activityReminderRadioButton.setSelected(false);
     scheduleChangeRadioButton.setSelected(false);
     importantEventsRadioButton.setSelected(false);
+  }
+
+  private void clearTextField() {
+    contentTextField.setDocument(new PlainDocument());
   }
 
   private void showScheduledMessage(JFrame frame) {
@@ -230,4 +237,5 @@ public class KafkaNotificationView {
       }
     });
   }
+
 }

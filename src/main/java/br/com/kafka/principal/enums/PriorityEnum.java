@@ -15,17 +15,4 @@ public enum PriorityEnum {
     this.description = description;
   }
 
-  public static PriorityEnum parse(String description) {
-    if (description == null || description.isEmpty()) {
-      return null;
-    }
-
-    for (PriorityEnum priorityEnum : PriorityEnum.values()) {
-      if (priorityEnum.description.equals(description)) {
-        return priorityEnum;
-      }
-    }
-
-    throw new AssertionError("Não foi encontrada prioridade para a descrição informada.");
-  }
 }

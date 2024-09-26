@@ -15,6 +15,9 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 @Configuration
 public class ConsumerConfig {
 
+  /**
+   *  SINGLE CONSUMER CONFIGS
+   */
   @Bean
   public DefaultKafkaConsumerFactory<String, String> singleConsumerFactory() {
     Map<String, Object> properties = new HashMap<>();
@@ -34,6 +37,9 @@ public class ConsumerConfig {
     return factory;
   }
 
+  /**
+   *  BATCH CONSUMER CONFIGS
+   */
   @Bean
   public DefaultKafkaConsumerFactory<String, String> batchConsumerFactory() {
     Map<String, Object> properties = new HashMap<>();

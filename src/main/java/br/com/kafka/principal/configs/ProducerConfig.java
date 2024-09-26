@@ -21,6 +21,7 @@ public class ProducerConfig {
     properties.put(org.apache.kafka.clients.producer.ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
     properties.put(org.apache.kafka.clients.producer.ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
     properties.put(org.apache.kafka.clients.producer.ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+
     properties.put(org.apache.kafka.clients.producer.ProducerConfig.BATCH_SIZE_CONFIG, 16384);
     properties.put(org.apache.kafka.clients.producer.ProducerConfig.BUFFER_MEMORY_CONFIG, 33554432);
     properties.put(org.apache.kafka.clients.producer.ProducerConfig.LINGER_MS_CONFIG, 10);
@@ -30,8 +31,7 @@ public class ProducerConfig {
 
   @Bean
   public KafkaTemplate<String, String> kafkaTemplate() {
-    KafkaTemplate<String, String> kafkaTemplate = new KafkaTemplate<>(producerFactory());
-    return kafkaTemplate;
+    return new KafkaTemplate<>(producerFactory());
   }
 
 }
