@@ -4,16 +4,20 @@ import br.com.kafka.principal.enums.PriorityEnum;
 import br.com.kafka.principal.models.Notification;
 import br.com.kafka.principal.producers.KafkaProducer;
 import br.com.kafka.principal.utils.FileUtils;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 import java.util.UUID;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
@@ -127,16 +131,37 @@ public class KafkaNotificationView {
     });
   }
 
-  public void showResult(JFrame frame, Notification notification) {
+  public void showResult(JFrame frame, List<Notification> notifications) {
     dialog.dispose();
+
+    JTabbedPane tabbedPane = createTabbedPane(notifications);
 
     JOptionPane.showMessageDialog(
       frame,
-      FileUtils.getHtml(notification),
-      "NOTIFICAÇÃO ENVIADA",
+      tabbedPane,
+      notifications.size() > 1 ? "NOTIFICAÇÕES ENVIADAS": "NOTIFICAÇÃO ENVIADA",
       JOptionPane.INFORMATION_MESSAGE,
       FileUtils.getIcon()
     );
+  }
+
+  private JTabbedPane createTabbedPane(List<Notification> notifications) {
+    JTabbedPane tabbedPane = new JTabbedPane();
+
+    int count = 1;
+
+    for (Notification notification : notifications) {
+      String html = FileUtils.getHtml(notification);
+
+      JEditorPane editorPane = new JEditorPane("text/html", html);
+      editorPane.setEditable(false);
+
+      tabbedPane.add(String.valueOf(count), editorPane);
+
+      count++;
+    }
+
+    return tabbedPane;
   }
 
   private boolean isInvalidButtons() {
@@ -205,5 +230,4 @@ public class KafkaNotificationView {
       }
     });
   }
-
 }

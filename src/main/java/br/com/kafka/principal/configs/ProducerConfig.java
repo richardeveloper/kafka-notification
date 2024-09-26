@@ -2,7 +2,9 @@ package br.com.kafka.principal.configs;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.kafka.common.serialization.StringSerializer;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;

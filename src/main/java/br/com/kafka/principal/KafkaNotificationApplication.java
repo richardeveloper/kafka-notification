@@ -3,7 +3,11 @@ package br.com.kafka.principal;
 import br.com.kafka.principal.models.Notification;
 import br.com.kafka.principal.producers.KafkaProducer;
 import br.com.kafka.principal.views.KafkaNotificationView;
+
+import java.util.List;
+
 import javax.swing.JFrame;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -35,7 +39,8 @@ public class KafkaNotificationApplication implements CommandLineRunner {
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
   }
 
-  public static void showResult(Notification notification) {
-    view.showResult(frame, notification);
+  public static void showResult(List<Notification> notifications) {
+    view.showResult(frame, notifications);
   }
+
 }

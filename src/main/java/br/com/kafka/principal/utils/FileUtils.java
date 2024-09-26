@@ -9,15 +9,13 @@ import java.io.FileReader;
 import java.time.format.DateTimeFormatter;
 
 import javax.swing.ImageIcon;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public class FileUtils {
 
-  private static final String HTML_PATH = "src/main/resources/success-notification.html";
-  private static final String ICON_PATH = "src/main/resources/success-icon.png";
+  private static final String HTML_PATH = "src/main/resources/files/notification.html";
+  private static final String ICON_PATH = "src/main/resources/files/notification.png";
 
-  private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+  private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss.SSS");
 
   public static String getHtml(Notification notification) {
     try {
@@ -32,10 +30,10 @@ public class FileUtils {
         .replace("EVENTO", notification.getEventType())
         .replace("MENSAGEM", notification.getMessage())
         .replace("PRIORIDADE", notification.getPriority().getDescription())
-        .replace("DATA_ENVIO", notification.getDate().format(DATE_TIME_FORMATTER));
+        .replace("DATA_AGENDAMENTO", notification.getScheduleDate().format(DATE_TIME_FORMATTER))
+        .replace("DATA_ENVIO", notification.getSendDate().format(DATE_TIME_FORMATTER));
     }
     catch (FileNotFoundException e) {
-      log.error(e.getMessage(), e);
       throw new RuntimeException(e);
     }
   }

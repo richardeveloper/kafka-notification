@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: kafka-notification
+
+server:
+  port: 8080
+
+kafka:
+  topics:
+    single: single-batch
+    batch: group-batch

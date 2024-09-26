@@ -19,13 +19,15 @@ public class Notification {
 
   private String eventType;
 
-  private LocalDateTime date;
+  private LocalDateTime scheduleDate;
+
+  private LocalDateTime sendDate;
 
   public Notification(String code, String message, PriorityEnum priority, String eventType) {
     this.code = code;
     this.message = message;
     this.priority = priority;
     this.eventType = eventType;
-    this.date = LocalDateTime.now();
   }
+
 }

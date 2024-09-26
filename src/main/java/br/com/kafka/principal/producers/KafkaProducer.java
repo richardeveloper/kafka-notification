@@ -4,6 +4,7 @@ import br.com.kafka.principal.models.Notification;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +35,7 @@ public class KafkaProducer {
     log.info("Iniciando processo de envio da notificação {}.", notification.getCode());
 
     try {
+      notification.setScheduleDate(LocalDateTime.now());
       String json = objectMapper.writeValueAsString(notification);
 
       switch (notification.getPriority()) {
@@ -50,12 +52,12 @@ public class KafkaProducer {
             break;
           }
 
-          log.info("Notificação {} armazenada para envio.", notification.getCode());
+          log.info("Notificação {} agendada para envio.", notification.getCode());
           break;
         case MID:
         case HIGH:
           kafkaTemplate.send(SINGLE_TOPIC, notification.getCode(), json);
-          log.info("Notificação {} enviada com sucesso.", notification.getCode());
+          log.info("Notificação {} agendada com sucesso.", notification.getCode());
           break;
       }
 
