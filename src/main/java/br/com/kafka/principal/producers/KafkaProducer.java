@@ -24,7 +24,7 @@ public class KafkaProducer {
   private static final String SINGLE_TOPIC = "single-notification";
   private static final String BATCH_TOPIC = "batch-notification";
 
-  private final NotificationBatch notificationBatch = new NotificationBatch();
+  private final NotificationBatch notificationBatch;
 
   @Autowired
   private KafkaTemplate<String, String> kafkaTemplate;
@@ -35,6 +35,10 @@ public class KafkaProducer {
   @Autowired
   private LogNotificationRepository logNotificationRepository;
 
+  public KafkaProducer() {
+    this.notificationBatch = new NotificationBatch();
+  }
+
   public void sendMessage(Notification notification) {
     log.info("Iniciando processo de envio da notificação {}.", notification.getCode());
 
@@ -44,8 +48,8 @@ public class KafkaProducer {
       String json = objectMapper.writeValueAsString(notification);
 
       LogNotificationEntity log = new LogNotificationEntity();
-      log.setNotificationCode(notification.getCode());
       log.setNotification(json);
+      log.setNotificationCode(notification.getCode());
       log.setScheduleDate(notification.getScheduleDate());
 
       switch (notification.getPriority()) {
@@ -59,7 +63,7 @@ public class KafkaProducer {
             break;
           }
 
-          KafkaProducer.log.info("Notificação {} agendada para envio.", notification.getCode());
+          KafkaProducer.log.info("Notificação {} agendada para envio futuro.", notification.getCode());
           break;
         case MID:
         case HIGH:

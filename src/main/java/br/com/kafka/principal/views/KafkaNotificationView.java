@@ -12,6 +12,8 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
@@ -129,43 +131,7 @@ public class KafkaNotificationView {
           return;
         }
 
-        String[] columns = { "#", "Data de Agendamento", "Código da Notificação", "Código do Lote", "Data de Envio", "Notificação"};
-
-        Object[][] rows = new Object[logs.size()][columns.length];
-
-        for (int i = 0; i < logs.size(); i++) {
-          rows[i][0] = (i + 1);
-          rows[i][1] = logs.get(i).getScheduleDate();
-          rows[i][2] = logs.get(i).getNotificationCode();
-          rows[i][3] = logs.get(i).getBatchCode() != null ? logs.get(i).getBatchCode() : "-";
-          rows[i][4] = logs.get(i).getSendDate();
-          rows[i][5] = logs.get(i).getNotification();
-        }
-
-        DefaultTableModel tableModel = new DefaultTableModel(rows, columns);
-
-        JTable table = new JTable(tableModel);
-        table.setRowHeight(25);
-        table.getTableHeader().setFont(new Font("JetBrains Mono", Font.PLAIN,  14));
-
-        table.getColumnModel().getColumn(0).setPreferredWidth(60);
-        table.getColumnModel().getColumn(1).setPreferredWidth(210);
-        table.getColumnModel().getColumn(2).setPreferredWidth(160);
-        table.getColumnModel().getColumn(3).setPreferredWidth(160);
-        table.getColumnModel().getColumn(4).setPreferredWidth(210);
-        table.getColumnModel().getColumn(5).setPreferredWidth(1500);
-
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-        for (int i = 0; i < columns.length; i++) {
-          table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
-        }
-
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-
-        JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setPreferredSize(new Dimension(1000, 500));
-        scrollPane.setEnabled(false);
+        JScrollPane scrollPane = createScrollPane(logs);
 
         JOptionPane.showMessageDialog(
           frame,
@@ -218,7 +184,7 @@ public class KafkaNotificationView {
     this.closeButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        frame.dispose();
+        System.exit(0);
       }
     });
   }
@@ -231,7 +197,7 @@ public class KafkaNotificationView {
     JOptionPane.showMessageDialog(
       frame,
       tabbedPane,
-      notifications.size() > 1 ? "NOTIFICAÇÕES ENVIADAS": "NOTIFICAÇÃO ENVIADA",
+      notifications.size() > 1 ? "LOTE DE NOTIFICAÇÕES ENVIADO": "NOTIFICAÇÃO ENVIADA",
       JOptionPane.INFORMATION_MESSAGE,
       FileUtils.getNotificationIcon()
     );
@@ -254,6 +220,48 @@ public class KafkaNotificationView {
     }
 
     return tabbedPane;
+  }
+
+  private JScrollPane createScrollPane(List<LogNotificationEntity> logs) {
+    String[] columns = { "#", "Data de Agendamento", "Código da Notificação", "Código do Lote", "Data de Envio", "Notificação"};
+
+    Object[][] rows = new Object[logs.size()][columns.length];
+
+    for (int i = 0; i < logs.size(); i++) {
+      rows[i][0] = (i + 1);
+      rows[i][1] = formatDate(logs.get(i).getScheduleDate());
+      rows[i][2] = logs.get(i).getNotificationCode();
+      rows[i][3] = logs.get(i).getBatchCode() != null ? logs.get(i).getBatchCode() : "-";
+      rows[i][4] = formatDate(logs.get(i).getSendDate());
+      rows[i][5] = logs.get(i).getNotification();
+    }
+
+    DefaultTableModel tableModel = new DefaultTableModel(rows, columns);
+
+    JTable table = new JTable(tableModel);
+    table.getTableHeader().setFont(new Font("JetBrains Mono", Font.PLAIN,  14));
+    table.setRowHeight(25);
+
+    table.getColumnModel().getColumn(0).setPreferredWidth(60);
+    table.getColumnModel().getColumn(1).setPreferredWidth(210);
+    table.getColumnModel().getColumn(2).setPreferredWidth(160);
+    table.getColumnModel().getColumn(3).setPreferredWidth(160);
+    table.getColumnModel().getColumn(4).setPreferredWidth(210);
+    table.getColumnModel().getColumn(5).setPreferredWidth(1800);
+
+    DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+    centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+    for (int i = 0; i < columns.length; i++) {
+      table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+    }
+
+    table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+    JScrollPane scrollPane = new JScrollPane(table);
+    scrollPane.setPreferredSize(new Dimension(1000, 500));
+    scrollPane.setEnabled(false);
+
+    return scrollPane;
   }
 
   private Notification createNotification() {
@@ -307,11 +315,6 @@ public class KafkaNotificationView {
   private void setUpTextField() {
     ((AbstractDocument) contentTextField.getDocument()).setDocumentFilter(new DocumentFilter() {
       @Override
-      public void remove(FilterBypass fb, int offset, int length) throws BadLocationException {
-        super.remove(fb, offset, length);
-      }
-
-      @Override
       public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
         if (fb.getDocument().getLength() <= 85) {
           super.insertString(fb, offset, string, attr);
@@ -325,6 +328,14 @@ public class KafkaNotificationView {
         }
       }
     });
+  }
+
+  private String formatDate(LocalDateTime date) {
+    if (date == null) {
+      return "-";
+    }
+
+    return date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss.SSS"));
   }
 
 }
