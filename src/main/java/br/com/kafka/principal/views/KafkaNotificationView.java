@@ -89,8 +89,8 @@ public class KafkaNotificationView {
         if (isInvalidButtons()) {
           JOptionPane.showMessageDialog(
             frame,
-            "Favor selecionar o tipo do evento a ser notificado.",
-            "AVISO",
+            "Favor selecionar o tipo de evento a ser notificado.",
+            "Aviso",
             JOptionPane.WARNING_MESSAGE
           );
           return;
@@ -100,7 +100,7 @@ public class KafkaNotificationView {
           JOptionPane.showMessageDialog(
             frame,
             "Favor inserir o contéudo da notificação.",
-            "AVISO",
+            "Aviso",
             JOptionPane.WARNING_MESSAGE
           );
           return;
@@ -125,7 +125,7 @@ public class KafkaNotificationView {
           JOptionPane.showMessageDialog(
             frame,
             "No momento não existem registros de logs.",
-            "AVISO",
+            "Aviso",
             JOptionPane.WARNING_MESSAGE
           );
           return;
@@ -136,7 +136,7 @@ public class KafkaNotificationView {
         JOptionPane.showMessageDialog(
           frame,
           scrollPane,
-          "RELATÓRIO",
+          "Relatório de Logs",
           JOptionPane.INFORMATION_MESSAGE,
           FileUtils.getReportIcon()
         );
@@ -151,7 +151,7 @@ public class KafkaNotificationView {
         clearTextField();
         disableAllButtons();
         activityReminderRadioButton.setSelected(true);
-        contentTextField.setText("Atenção, a data limite para entrega da atividade é dia 04/09/2024.");
+        contentTextField.setText("Atenção, a data limite para entrega e apresentação da atividade é dia 04/10/2024.");
       }
     });
   }
@@ -175,7 +175,7 @@ public class KafkaNotificationView {
         clearTextField();
         disableAllButtons();
         importantEventsRadioButton.setSelected(true);
-        contentTextField.setText("Dia 12/12/2024 acontece a XXV conferência de apresentação das atualizações e novidades do Java Swing.");
+        contentTextField.setText("Dia 12/12/2024 acontecerá o evento de apresentação das atualizações e novidades do Java Swing.");
       }
     });
   }
@@ -197,7 +197,7 @@ public class KafkaNotificationView {
     JOptionPane.showMessageDialog(
       frame,
       tabbedPane,
-      notifications.size() > 1 ? "LOTE DE NOTIFICAÇÕES ENVIADO": "NOTIFICAÇÃO ENVIADA",
+      notifications.size() > 1 ? "Lote de notificações enviado": "Notificação enviada",
       JOptionPane.INFORMATION_MESSAGE,
       FileUtils.getNotificationIcon()
     );
@@ -307,8 +307,12 @@ public class KafkaNotificationView {
   }
 
   private void showScheduledMessage(JFrame frame) {
-    JOptionPane jOptionPane = new JOptionPane("Notificação agendada com sucesso.", JOptionPane.INFORMATION_MESSAGE);
-    dialog = jOptionPane.createDialog(frame, "AGENDAMENTO");
+    JOptionPane jOptionPane = new JOptionPane(
+      "Notificação agendada com sucesso.",
+      JOptionPane.INFORMATION_MESSAGE
+    );
+
+    dialog = jOptionPane.createDialog(frame, "Confirmação");
     dialog.setVisible(true);
   }
 

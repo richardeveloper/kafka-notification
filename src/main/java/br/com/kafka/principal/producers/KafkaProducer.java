@@ -47,23 +47,23 @@ public class KafkaProducer {
 
       String json = objectMapper.writeValueAsString(notification);
 
-      LogNotificationEntity log = new LogNotificationEntity();
-      log.setNotification(json);
-      log.setNotificationCode(notification.getCode());
-      log.setScheduleDate(notification.getScheduleDate());
+      LogNotificationEntity logNotificationEntity = new LogNotificationEntity();
+      logNotificationEntity.setNotification(json);
+      logNotificationEntity.setNotificationCode(notification.getCode());
+      logNotificationEntity.setScheduleDate(notification.getScheduleDate());
 
       switch (notification.getPriority()) {
         case LOW:
-          validateNotification(json, log);
+          validateNotification(json, logNotificationEntity);
 
           if (notificationBatch.size() == BATCH_SIZE) {
             notificationBatch.forEach(message -> kafkaTemplate.send(BATCH_TOPIC, json, message));
-            KafkaProducer.log.info("Lote de notificações enviado com sucesso.");
+            log.info("Lote de notificações enviado com sucesso.");
             notificationBatch.clear();
             break;
           }
 
-          KafkaProducer.log.info("Notificação {} agendada para envio futuro.", notification.getCode());
+          log.info("Notificação {} agendada para envio futuro.", notification.getCode());
           break;
         case MID:
         case HIGH:
@@ -72,7 +72,7 @@ public class KafkaProducer {
           break;
       }
 
-      logNotificationRepository.save(log);
+      logNotificationRepository.save(logNotificationEntity);
     }
     catch (Exception e) {
       log.error(e.getMessage(), e);

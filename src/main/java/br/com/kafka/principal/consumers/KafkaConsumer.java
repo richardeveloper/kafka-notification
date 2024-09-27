@@ -28,6 +28,7 @@ public class KafkaConsumer {
 
   private static final String BATCH_TOPIC = "batch-notification";
   private static final String BATCH_GROUP = "batch-group";
+  private static final String CONTAINER_FACTORY = "batchKafkaListenerContainerFactory";
 
   private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss.SSS");
 
@@ -43,13 +44,13 @@ public class KafkaConsumer {
       Notification notification = objectMapper.readValue(message, Notification.class);
       notification.setSendDate(LocalDateTime.now());
 
-      LogNotificationEntity log = logNotificationRepository.findByNotificationCode(notification.getCode());
-      log.setSendDate(notification.getSendDate());
+      LogNotificationEntity logNotificationEntity = logNotificationRepository.findByNotificationCode(notification.getCode());
+      logNotificationEntity.setSendDate(notification.getSendDate());
 
-      KafkaConsumer.log.info("Notificação recebida com sucesso.");
+      log.info("Notificação recebida com sucesso.");
       logInfoNotification(notification);
 
-      logNotificationRepository.save(log);
+      logNotificationRepository.save(logNotificationEntity);
 
       KafkaNotificationApplication.showResult(List.of(notification));
     }
@@ -58,7 +59,7 @@ public class KafkaConsumer {
     }
   }
 
-  @KafkaListener(topics = BATCH_TOPIC, groupId = BATCH_GROUP, containerFactory = "batchKafkaListenerContainerFactory")
+  @KafkaListener(topics = BATCH_TOPIC, groupId = BATCH_GROUP, containerFactory = CONTAINER_FACTORY)
   public void receiveMessages(List<String> messages) {
     log.info("Lote de notificações recebido com sucesso. Tamamho: {}", messages.size());
 
@@ -69,14 +70,14 @@ public class KafkaConsumer {
         Notification notification = objectMapper.readValue(message, Notification.class);
         notification.setSendDate(LocalDateTime.now());
 
-        LogNotificationEntity log = logNotificationRepository.findByNotificationCode(notification.getCode());
-        log.setSendDate(notification.getSendDate());
+        LogNotificationEntity logNotificationEntity = logNotificationRepository.findByNotificationCode(notification.getCode());
+        logNotificationEntity.setSendDate(notification.getSendDate());
 
         logInfoNotification(notification);
 
         notifications.add(notification);
 
-        logNotificationRepository.save(log);
+        logNotificationRepository.save(logNotificationEntity);
       }
 
       KafkaNotificationApplication.showResult(notifications);
