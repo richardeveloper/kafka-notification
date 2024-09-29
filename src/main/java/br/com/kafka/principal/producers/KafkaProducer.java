@@ -47,10 +47,7 @@ public class KafkaProducer {
 
       String json = objectMapper.writeValueAsString(notification);
 
-      LogNotificationEntity logNotificationEntity = new LogNotificationEntity();
-      logNotificationEntity.setNotification(json);
-      logNotificationEntity.setNotificationCode(notification.getCode());
-      logNotificationEntity.setScheduleDate(notification.getScheduleDate());
+      LogNotificationEntity logNotificationEntity = createLogNotification(notification, json);
 
       switch (notification.getPriority()) {
         case LOW:
@@ -77,6 +74,15 @@ public class KafkaProducer {
     catch (Exception e) {
       log.error(e.getMessage(), e);
     }
+  }
+
+  private LogNotificationEntity createLogNotification(Notification notification, String json) {
+    LogNotificationEntity logNotificationEntity = new LogNotificationEntity();
+    logNotificationEntity.setNotification(json);
+    logNotificationEntity.setNotificationCode(notification.getCode());
+    logNotificationEntity.setScheduleDate(notification.getScheduleDate());
+
+    return logNotificationEntity;
   }
 
   private void validateNotification(String json, LogNotificationEntity log) {

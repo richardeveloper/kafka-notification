@@ -5,6 +5,7 @@ import br.com.kafka.principal.entities.LogNotificationEntity;
 import br.com.kafka.principal.models.Notification;
 
 import br.com.kafka.principal.repositories.LogNotificationRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
@@ -44,13 +45,10 @@ public class KafkaConsumer {
       Notification notification = objectMapper.readValue(message, Notification.class);
       notification.setSendDate(LocalDateTime.now());
 
-      LogNotificationEntity logNotificationEntity = logNotificationRepository.findByNotificationCode(notification.getCode());
-      logNotificationEntity.setSendDate(notification.getSendDate());
-
       log.info("Notificação recebida com sucesso.");
       logInfoNotification(notification);
 
-      logNotificationRepository.save(logNotificationEntity);
+      registerLogNotification(notification);
 
       KafkaNotificationApplication.showResult(List.of(notification));
     }
@@ -64,30 +62,35 @@ public class KafkaConsumer {
     log.info("Lote de notificações recebido com sucesso. Tamamho: {}", messages.size());
 
     try {
-      List<Notification> notifications = new ArrayList<>();
+      List<Notification> notificationList = new ArrayList<>();
 
       for (String message : messages) {
         Notification notification = objectMapper.readValue(message, Notification.class);
         notification.setSendDate(LocalDateTime.now());
 
-        LogNotificationEntity logNotificationEntity = logNotificationRepository.findByNotificationCode(notification.getCode());
-        logNotificationEntity.setSendDate(notification.getSendDate());
-
         logInfoNotification(notification);
 
-        notifications.add(notification);
+        notificationList.add(notification);
 
-        logNotificationRepository.save(logNotificationEntity);
+        registerLogNotification(notification);
       }
 
-      KafkaNotificationApplication.showResult(notifications);
+      KafkaNotificationApplication.showResult(notificationList);
     }
     catch (Exception e) {
       log.error(e.getMessage(), e);
     }
   }
 
-  private static void logInfoNotification(Notification notification) {
+  private void registerLogNotification(Notification notification) throws JsonProcessingException {
+    LogNotificationEntity logNotificationEntity = logNotificationRepository.findByNotificationCode(notification.getCode());
+    logNotificationEntity.setNotification(objectMapper.writeValueAsString(notification));
+    logNotificationEntity.setSendDate(notification.getSendDate());
+
+    logNotificationRepository.save(logNotificationEntity);
+  }
+
+  private void logInfoNotification(Notification notification) {
     log.info("==============================================================================================================");
     log.info("DETALHES DA NOTIFICAÇÃO");
     log.info("==============================================================================================================");

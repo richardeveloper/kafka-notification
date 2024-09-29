@@ -59,7 +59,7 @@ public class KafkaNotificationView {
 
   private JPanel buttonPanel;
   private JButton sendButton;
-  private JButton logButton;
+  private JButton reportButton;
   private JButton closeButton;
 
   private JDialog dialog;
@@ -74,7 +74,7 @@ public class KafkaNotificationView {
     setUpTextField();
 
     actionSendButton(frame);
-    actionLogButton(frame);
+    actionReportButton(frame);
     actionActivityReminderRadioButton();
     actionScheduleChangeRadioButton();
     actionImportantEventsRadioButton();
@@ -115,8 +115,8 @@ public class KafkaNotificationView {
     });
   }
 
-  public void actionLogButton(JFrame frame) {
-    this.logButton.addActionListener(new ActionListener() {
+  public void actionReportButton(JFrame frame) {
+    this.reportButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
         List<LogNotificationEntity> logs = repository.findAll();
@@ -124,7 +124,7 @@ public class KafkaNotificationView {
         if (logs.isEmpty()) {
           JOptionPane.showMessageDialog(
             frame,
-            "No momento não existem registros de logs.",
+            "No momento não existem registros para geração do relatório.",
             "Aviso",
             JOptionPane.WARNING_MESSAGE
           );
@@ -247,7 +247,7 @@ public class KafkaNotificationView {
     table.getColumnModel().getColumn(2).setPreferredWidth(160);
     table.getColumnModel().getColumn(3).setPreferredWidth(160);
     table.getColumnModel().getColumn(4).setPreferredWidth(210);
-    table.getColumnModel().getColumn(5).setPreferredWidth(1800);
+    table.getColumnModel().getColumn(5).setPreferredWidth(1900);
 
     DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
     centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);

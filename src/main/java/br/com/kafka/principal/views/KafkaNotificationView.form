@@ -126,7 +126,7 @@
                       <text value="Enviar Notificação"/>
                     </properties>
                   </component>
-                  <component id="fb47" class="javax.swing.JButton" binding="logButton">
+                  <component id="fb47" class="javax.swing.JButton" binding="reportButton">
                     <constraints>
                       <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false">
                         <maximum-size width="300" height="-1"/>
@@ -135,7 +135,7 @@
                     <properties>
                       <enabled value="true"/>
                       <font name="JetBrains Mono" size="14"/>
-                      <text value="Visualizar Logs"/>
+                      <text value="Gerar Relatório"/>
                     </properties>
                   </component>
                   <component id="8a6ac" class="javax.swing.JButton" binding="closeButton">
