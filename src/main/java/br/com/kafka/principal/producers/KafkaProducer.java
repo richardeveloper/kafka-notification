@@ -65,7 +65,7 @@ public class KafkaProducer {
         case MID:
         case HIGH:
           kafkaTemplate.send(SINGLE_TOPIC, notification.getCode(), json);
-          KafkaProducer.log.info("Notificação {} agendada com sucesso.", notification.getCode());
+          log.info("Notificação {} agendada com sucesso.", notification.getCode());
           break;
       }
 
