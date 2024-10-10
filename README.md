@@ -1,5 +1,12 @@
 # ADS1242 - Atividade 02: Notificações com Kafka
 
+<div align="center">
+
+![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
+![Apache Kafka](https://img.shields.io/badge/Apache%20Kafka-000?style=for-the-badge&logo=apachekafka)
+
+</div>
+
 ## Instruções
 <p align="justify"> Desenvolva um sistema de gerenciamento de eventos e notificações utilizando Kafka como base para a comunicação entre os serviços. O sistema deverá ser capaz de lidar com a geração, processamento e envio de notificações em tempo real e em lote. Imagine que o sistema será utilizado em um ambiente acadêmico para gerenciar notificações de eventos, como lembretes de tarefas, avisos de alterações no cronograma e eventos importantes, como palestras ou workshops. </p>
 
